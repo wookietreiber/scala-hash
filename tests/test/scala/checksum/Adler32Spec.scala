@@ -13,6 +13,8 @@ class Adler32Spec extends Specification with ScalaCheck { def is = s2"""
   (checksum) must be equal to the default implementation (small, i.e. no delay anyway)    $e1
   (checksum) must be equal to the default implementation (large, i.e. delay)              $e2
   (checksum) combination should be equal to the single run                                $e3
+  (scalaz combination monoid) must be equal to the default implementation                 $e4
+  (spire combination monoid) must be equal to the default implementation                  $e5
                                                                                                  """
 
   // -----------------------------------------------------------------------------------------------
@@ -31,6 +33,24 @@ class Adler32Spec extends Specification with ScalaCheck { def is = s2"""
 
   def e3 = prop { (a: Array[Byte], b: Array[Byte]) ⇒
     compare(Adler32(a).combine(Adler32(b), b.length), JAdler32(a ++ b))
+  }
+
+  def e4 = prop { (bufs: Stream[Array[Byte]]) ⇒
+    import scalaz.std.stream._
+    import scalaz.syntax.traverse._
+    import scalaz.contrib.hash.checksum.adler32._
+
+    val (sa,_) = bufs.foldMap(buf ⇒ (Adler32(buf),buf.length))
+
+    compare(sa, JAdler32(bufs))
+  }
+
+  def e5 = prop { (bufs: Stream[Array[Byte]]) ⇒
+    val acm = spire.contrib.hash.checksum.adler32.Adler32CombinationMonoid
+
+    val (sa,_) = bufs.map(buf ⇒ (Adler32(buf),buf.length)).foldLeft(acm.id)(acm.op)
+
+    compare(sa, JAdler32(bufs))
   }
 
   // -----------------------------------------------------------------------------------------------
