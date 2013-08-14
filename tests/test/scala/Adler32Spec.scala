@@ -1,5 +1,4 @@
 package scalax.hash
-package checksum
 
 import java.util.zip.{ Adler32 ⇒ JAdler32 }
 
@@ -38,7 +37,7 @@ class Adler32Spec extends Specification with ScalaCheck { def is = s2"""
   def e4 = prop { (bufs: Stream[Array[Byte]]) ⇒
     import scalaz.std.stream._
     import scalaz.syntax.traverse._
-    import scalaz.contrib.hash.checksum.adler32._
+    import scalaz.contrib.hash.adler32._
 
     val (sa,_) = bufs.foldMap(buf ⇒ (Adler32(buf),buf.length))
 
@@ -46,7 +45,7 @@ class Adler32Spec extends Specification with ScalaCheck { def is = s2"""
   }
 
   def e5 = prop { (bufs: Stream[Array[Byte]]) ⇒
-    val acm = spire.contrib.hash.checksum.adler32.Adler32CombinationMonoid
+    val acm = spire.contrib.hash.adler32.Adler32CombinationMonoid
 
     val (sa,_) = bufs.map(buf ⇒ (Adler32(buf),buf.length)).foldLeft(acm.id)(acm.op)
 

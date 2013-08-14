@@ -1,5 +1,4 @@
 package scalax.hash
-package checksum
 
 /** An Adler32 checksum.
   *
