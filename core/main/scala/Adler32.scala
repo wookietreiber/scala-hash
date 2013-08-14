@@ -21,7 +21,7 @@ final case class Adler32 private (hash: Long) {
 
   /** Updates this Adler32 with new data.
     *
-    * @param data the data to update the Adler32 with
+    * @param data the data to update this Adler32 with
     * @param start the start index to use from the data buffer
     * @param length the amount of bytes to use from the data buffer
     */
