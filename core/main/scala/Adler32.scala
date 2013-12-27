@@ -50,7 +50,7 @@ final case class Adler32 private (hash: Long) {
       while (l1 > 0) {
         l1 -= 1
 
-        var k = 5552L
+        var k = 5552
         while (k > 0) {
           k -= 1
           bump
