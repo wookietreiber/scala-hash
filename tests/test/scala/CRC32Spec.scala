@@ -35,11 +35,9 @@ class CRC32Spec extends Specification with ScalaCheck { def is = s2"""
   }
 
   def e4 = prop { (bufs: Stream[Array[Byte]]) ⇒
-    import scalaz.std.stream._
-    import scalaz.syntax.traverse._
-    import scalaz.contrib.hash.crc32._
+    val acm = scalaz.contrib.hash.crc32.CRC32CombinationMonoid
 
-    val (scrc,_) = bufs.foldMap(buf ⇒ (CRC32(buf),buf.length))
+    val (scrc,_) = bufs.map(buf ⇒ (CRC32(buf),buf.length)).foldLeft(acm.zero)((a,b) => acm.append(a,b))
 
     compare(scrc, JCRC32(bufs))
   }
