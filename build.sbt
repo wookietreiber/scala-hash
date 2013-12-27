@@ -36,6 +36,6 @@ lazy val tests = (
   HashProject("scala-hash-tests", "tests")
   dependsOn(hash, scalazContrib, spireContrib)
   settings(
-    libraryDependencies ++= Seq(scalacheck % "test", specs2 % "test")
+    libraryDependencies ++= Seq(specs2 % "test")
   )
 )
