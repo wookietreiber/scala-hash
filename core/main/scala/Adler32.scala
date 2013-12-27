@@ -29,20 +29,12 @@ final case class Adler32 private (hash: Long) {
     var (s1,s2) = split
     var index = start
 
-    @inline def bump: Unit = {
+    if (length == 1) {
       s1 += data(index) & 255
       s2 += s1
       index += 1
-    }
-
-    @inline def mod: Unit = {
       s1 %= 65521L
       s2 %= 65521L
-    }
-
-    if (length == 1) {
-      bump
-      mod
     } else {
       var l1 = length / 5552L
       var l2 = length % 5552L
@@ -53,18 +45,24 @@ final case class Adler32 private (hash: Long) {
         var k = 5552
         while (k > 0) {
           k -= 1
-          bump
+          s1 += data(index) & 255
+          s2 += s1
+          index += 1
         }
 
-        mod
+        s1 %= 65521L
+        s2 %= 65521L
       }
 
       while (l2 > 0) {
         l2 -= 1
-        bump
+        s1 += data(index) & 255
+        s2 += s1
+        index += 1
       }
 
-      mod
+      s1 %= 65521L
+      s2 %= 65521L
     }
 
     Adler32.join(s1, s2)
