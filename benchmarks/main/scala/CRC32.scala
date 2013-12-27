@@ -8,20 +8,17 @@ object CRC32Benchmark extends PerformanceTest {
   lazy val reporter = new LoggingReporter
   lazy val persistor = Persistor.None
 
-  val sizes = Gen.range("size")(300000, 1500000, 300000)
+  val sizes = Gen.range("MB")(4,32,4)
 
-  val datasets = for (size <- sizes) yield {
-    val x = 0.toByte
-    var a = Array.fill(size)(x)
-    util.Random.nextBytes(a)
-    a
-  }
+  val datasets = for (size <- sizes) yield
+    Stream.fill(size)(Random.MB)
 
   performance of "java.util.zip.CRC32" in {
     measure method "update" in {
       using(datasets) in { data ⇒
         val a = new java.util.zip.CRC32
-        a.update(data)
+        for (chunk <- data)
+          a.update(chunk)
         a.getValue
       }
     }
@@ -30,7 +27,9 @@ object CRC32Benchmark extends PerformanceTest {
   performance of "scalax.hash.CRC32" in {
     measure method "update" in {
       using(datasets) in { data ⇒
-        val a = CRC32(data)
+        var a = CRC32()
+        for (chunk <- data)
+          a = a.update(chunk)
         a.hash
       }
     }
