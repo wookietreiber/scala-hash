@@ -1,10 +1,13 @@
 import scalax.hash.build._
 import Dependencies._
 
+import UnidocKeys._
+
 lazy val root = (
   HashProject("scala-hash", ".")
   settings(sbtunidoc.Plugin.unidocSettings: _*)
   settings(
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmarks),
     scalacOptions in (Compile, doc) ++=
       Seq("-sourcepath", baseDirectory.value.getAbsolutePath, "-doc-source-url",
         "https://github.com/wookietreiber/scala-hash/tree/master€{FILE_PATH}.scala")
@@ -29,6 +32,15 @@ lazy val spireContrib = (
   dependsOn(hash)
   settings(
     libraryDependencies += spire
+  )
+)
+
+lazy val benchmarks = (
+  HashProject("scala-hash-benchmarks", "benchmarks")
+  dependsOn(hash, scalazContrib, spireContrib)
+  settings(
+    libraryDependencies ++= Seq(scalameter),
+    testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
   )
 )
 
