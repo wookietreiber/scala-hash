@@ -12,7 +12,7 @@ lazy val root = (
       Seq("-sourcepath", baseDirectory.value.getAbsolutePath, "-doc-source-url",
         "https://github.com/wookietreiber/scala-hash/tree/master€{FILE_PATH}.scala")
   )
-  aggregate(hash, scalazContrib, spireContrib, tests)
+  aggregate(hash, scalazContrib, spireContrib, tests, benchmarks)
 )
 
 lazy val hash = (
@@ -40,6 +40,7 @@ lazy val benchmarks = (
   dependsOn(hash, scalazContrib, spireContrib)
   settings(
     libraryDependencies ++= Seq(scalameter),
+    fork in run := true,
     testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
   )
 )
