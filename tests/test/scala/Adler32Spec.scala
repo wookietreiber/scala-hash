@@ -35,17 +35,17 @@ class Adler32Spec extends Specification with ScalaCheck { def is = s2"""
   }
 
   def e4 = prop { (bufs: Stream[Array[Byte]]) ⇒
-    val acm = scalaz.contrib.hash.adler32.Adler32CombinationMonoid
+    val monoid = scalaz.contrib.hash.adler32.Adler32CombinationMonoid
 
-    val (sa,_) = bufs.map(buf ⇒ (Adler32(buf),buf.length)).foldLeft(acm.zero)((a,b) => acm.append(a,b))
+    val (sa,_) = bufs.map(buf ⇒ (Adler32(buf),buf.length)).foldLeft(monoid.zero)((a,b) => monoid.append(a,b))
 
     compare(sa, JAdler32(bufs))
   }
 
   def e5 = prop { (bufs: Stream[Array[Byte]]) ⇒
-    val acm = spire.contrib.hash.adler32.Adler32CombinationMonoid
+    val monoid = spire.contrib.hash.adler32.Adler32CombinationMonoid
 
-    val (sa,_) = bufs.map(buf ⇒ (Adler32(buf),buf.length)).foldLeft(acm.id)(acm.op)
+    val (sa,_) = bufs.map(buf ⇒ (Adler32(buf),buf.length)).foldLeft(monoid.id)(monoid.op)
 
     compare(sa, JAdler32(bufs))
   }
