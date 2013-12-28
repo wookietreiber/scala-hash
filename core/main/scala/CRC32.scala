@@ -4,7 +4,7 @@ package scalax.hash
   *
   * @param hash Returns the CRC value.
   */
-final case class CRC32 private (hash: Long) {
+final case class CRC32 private (hash: Long) (private val fed: Long) {
 
   /** Updates this CRC32 with new data.
     *
@@ -31,22 +31,21 @@ final case class CRC32 private (hash: Long) {
       len -= 1
     }
 
-    new CRC32((~c).toLong & 4294967295L)
+    new CRC32((~c).toLong & 4294967295L)(fed + length)
   }
 
-  /** Combines this CRC32 with another one.
+  /** Updates this CRC32 with another one.
     *
-    * @param that the CRC32 to combine with
-    * @param length the amount of data that has been fed to `that` CRC32
+    * @param that the CRC32 to update with
     */
-  def combine(that: CRC32, length: Long): CRC32 = if (length <= 0) {
+  def update(that: CRC32): CRC32 = if (that.fed == 0) {
     this
   } else {
     var row = 1L
 
     var crc1 = this.hash
     var crc2 = that.hash
-    var len2 = length
+    var length = that.fed
 
     var odd  = Array.tabulate(CRC32.GF2_DIM) { n ⇒
       if (n == 0)
@@ -64,26 +63,26 @@ final case class CRC32 private (hash: Long) {
     do {
       even = CRC32.gf2MatrixSquare(odd)
 
-      if ((len2 & 1) != 0)
+      if ((length & 1) != 0)
         crc1 = CRC32.gf2MatrixTimes(even, crc1)
 
-      len2 >>= 1
+      length >>= 1
 
-      if (len2 == 0) {
+      if (length == 0) {
         crc1 ^= crc2
-        return new CRC32(crc1)
+        return new CRC32(crc1)(this.fed + that.fed)
       }
 
       odd = CRC32.gf2MatrixSquare(even)
 
-      if ((len2 & 1) != 0)
+      if ((length & 1) != 0)
         crc1 = CRC32.gf2MatrixTimes(odd, crc1)
 
-      len2 >>= 1
-    } while (len2 != 0)
+      length >>= 1
+    } while (length != 0)
 
     crc1 ^= crc2
-    new CRC32(crc1)
+    new CRC32(crc1)(this.fed + that.fed)
   }
 
 }
@@ -91,10 +90,10 @@ final case class CRC32 private (hash: Long) {
 /** CRC32 factory. */
 object CRC32 {
 
-  /** Returns an empty CRC32. */
-  val empty: CRC32 = new CRC32(0L)
+  /** Returns the empty CRC32. */
+  val empty: CRC32 = new CRC32(0L)(0L)
 
-  /** Returns an empty CRC32. */
+  /** Returns the empty CRC32. */
   @inline def apply(): CRC32 = empty
 
   /** Returns the CRC32 of the given data buffer.

@@ -9,11 +9,10 @@ object crc32 extends CRC32Instances
 
 trait CRC32Instances {
 
-  implicit val CRC32CombinationMonoid: Monoid[(CRC32,Int)] = new Monoid[(CRC32,Int)] {
-    override val zero = (CRC32(),0)
-    override def append(x: (CRC32,Int), y: ⇒ (CRC32,Int)): (CRC32,Int) = {
-      (x._1.combine(y._1, y._2), x._2 + y._2)
-    }
+  implicit val CRC32Monoid: Monoid[CRC32] = new Monoid[CRC32] {
+    override val zero = CRC32.empty
+    override def append(x: CRC32, y: ⇒ CRC32): CRC32 =
+      x update y
   }
 
 }

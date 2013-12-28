@@ -20,7 +20,7 @@ class CRC32Spec extends Specification with ScalaCheck { def is = s2"""
   // tests
   // -----------------------------------------------------------------------------------------------
 
-  def e0 = compare(CRC32(), new JCRC32)
+  def e0 = compare(CRC32.empty, new JCRC32)
 
   def e1 = prop { (a: Array[Byte]) ⇒
     compare(CRC32(a), JCRC32(a))
@@ -31,21 +31,23 @@ class CRC32Spec extends Specification with ScalaCheck { def is = s2"""
   }.set(minTestsOk = 20, minSize = 10000, maxSize = 100000)
 
   def e3 = prop { (a: Array[Byte], b: Array[Byte]) ⇒
-    compare(CRC32(a).combine(CRC32(b), b.length), JCRC32(a ++ b))
+    compare(CRC32(a) update CRC32(b), JCRC32(a ++ b))
   }
 
   def e4 = prop { (bufs: Stream[Array[Byte]]) ⇒
-    val monoid = scalaz.contrib.hash.crc32.CRC32CombinationMonoid
+    import scalaz.contrib.hash.crc32.CRC32Monoid
+    import scalaz.std.stream._
+    import scalaz.syntax.foldable._
 
-    val (scrc,_) = bufs.map(buf ⇒ (CRC32(buf),buf.length)).foldLeft(monoid.zero)((a,b) => monoid.append(a,b))
+    val scrc = bufs.foldMap(CRC32.apply)
 
     compare(scrc, JCRC32(bufs))
   }
 
   def e5 = prop { (bufs: Stream[Array[Byte]]) ⇒
-    val monoid = spire.contrib.hash.crc32.CRC32CombinationMonoid
+    val monoid = spire.contrib.hash.crc32.CRC32Monoid
 
-    val (scrc,_) = bufs.map(buf ⇒ (CRC32(buf),buf.length)).foldLeft(monoid.id)(monoid.op)
+    val scrc = bufs.map(CRC32.apply).foldLeft(monoid.id)(monoid.op)
 
     compare(scrc, JCRC32(bufs))
   }
