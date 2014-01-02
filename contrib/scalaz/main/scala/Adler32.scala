@@ -3,11 +3,14 @@ package hash
 
 import scalax.hash.Adler32
 
-import scalaz.Monoid
+import scalaz._
 
 object adler32 extends Adler32Instances
 
 trait Adler32Instances {
+
+  implicit val Adler32Equal: Equal[Adler32] =
+    Equal.equalA
 
   implicit val Adler32Monoid: Monoid[Adler32] = new Monoid[Adler32] {
     override val zero = Adler32.empty
