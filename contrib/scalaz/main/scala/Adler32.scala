@@ -18,4 +18,7 @@ trait Adler32Instances {
       x update y
   }
 
+  implicit val Adler32Show: Show[Adler32] =
+    Show.showFromToString
+
 }

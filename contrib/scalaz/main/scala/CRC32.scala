@@ -18,4 +18,7 @@ trait CRC32Instances {
       x update y
   }
 
+  implicit val CRC32Show: Show[CRC32] =
+    Show.showFromToString
+
 }
