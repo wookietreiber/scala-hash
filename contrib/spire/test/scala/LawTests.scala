@@ -7,9 +7,13 @@ import spire.laws._
 import scalax.hash.scalacheck.arbitrary._
 
 object Adler32Spec extends Properties("Adler32") with Adler32Instances {
-  property("monoid") = GroupLaws[Adler32].monoid.all
+  for ((name, prop) <- GroupLaws[Adler32].monoid.all.properties) yield {
+    property(name) = prop
+  }
 }
 
 object CRC32Spec extends Properties("CRC32") with CRC32Instances {
-  property("monoid") = GroupLaws[CRC32].monoid.all
+  for ((name, prop) <- GroupLaws[CRC32].monoid.all.properties) yield {
+    property(name) = prop
+  }
 }

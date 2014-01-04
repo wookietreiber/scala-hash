@@ -30,8 +30,9 @@ lazy val scalacheckBinding = (
 lazy val scalazContrib = (
   HashProject("scala-hash-scalaz-contrib", "contrib/scalaz")
   dependsOn(hash)
+  dependsOn(scalacheckBinding % "test")
   settings(
-    libraryDependencies += scalaz
+    libraryDependencies ++= Seq(scalaz, scalazscb % "test")
   )
 )
 
