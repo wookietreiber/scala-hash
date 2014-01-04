@@ -12,11 +12,19 @@ lazy val root = (
       Seq("-sourcepath", baseDirectory.value.getAbsolutePath, "-doc-source-url",
         "https://github.com/wookietreiber/scala-hash/tree/master€{FILE_PATH}.scala")
   )
-  aggregate(hash, scalazContrib, spireContrib, tests, benchmarks)
+  aggregate(hash, scalacheckBinding, scalazContrib, spireContrib, tests, benchmarks)
 )
 
 lazy val hash = (
   HashProject("scala-hash-core", "core")
+)
+
+lazy val scalacheckBinding = (
+  HashProject("scala-hash-scalacheck-binding", "scalacheck")
+  dependsOn(hash)
+  settings(
+    libraryDependencies += scalacheck % Provided
+  )
 )
 
 lazy val scalazContrib = (
