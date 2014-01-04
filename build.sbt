@@ -38,8 +38,9 @@ lazy val scalazContrib = (
 lazy val spireContrib = (
   HashProject("scala-hash-spire-contrib", "contrib/spire")
   dependsOn(hash)
+  dependsOn(scalacheckBinding % "test")
   settings(
-    libraryDependencies += spire
+    libraryDependencies ++= Seq(spire, spirescb % "test")
   )
 )
 
