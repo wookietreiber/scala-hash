@@ -1,13 +1,14 @@
 package scalaz.contrib
 package hash
 
-import scalax.hash.CRC32
-
 import scalaz._
 
 object crc32 extends CRC32Instances
 
 trait CRC32Instances {
+
+  type CRC32 = scalax.hash.CRC32
+  val  CRC32 = scalax.hash.CRC32
 
   implicit val CRC32Equal: Equal[CRC32] =
     Equal.equalA

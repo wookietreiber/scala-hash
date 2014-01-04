@@ -1,13 +1,14 @@
 package scalaz.contrib
 package hash
 
-import scalax.hash.Adler32
-
 import scalaz._
 
 object adler32 extends Adler32Instances
 
 trait Adler32Instances {
+
+  type Adler32 = scalax.hash.Adler32
+  val  Adler32 = scalax.hash.Adler32
 
   implicit val Adler32Equal: Equal[Adler32] =
     Equal.equalA
