@@ -1,6 +1,6 @@
 package scalax.hash
 
-import java.util.zip.{ CRC32 ⇒ JCRC32 }
+import java.util.zip.{ CRC32 => JCRC32 }
 
 import org.specs2._
 
@@ -22,19 +22,19 @@ class CRC32Spec extends Specification with ScalaCheck { def is = s2"""
 
   def e0 = compare(CRC32.empty, new JCRC32)
 
-  def e1 = prop { (a: Array[Byte]) ⇒
+  def e1 = prop { (a: Array[Byte]) =>
     compare(CRC32(a), JCRC32(a))
   }
 
-  def e2 = prop { (a: Array[Byte]) ⇒
+  def e2 = prop { (a: Array[Byte]) =>
     compare(CRC32(a), JCRC32(a))
   }.set(minTestsOk = 20, minSize = 10000, maxSize = 100000)
 
-  def e3 = prop { (a: Array[Byte], b: Array[Byte]) ⇒
+  def e3 = prop { (a: Array[Byte], b: Array[Byte]) =>
     compare(CRC32(a) update CRC32(b), JCRC32(a ++ b))
   }
 
-  def e4 = prop { (bufs: Stream[Array[Byte]]) ⇒
+  def e4 = prop { (bufs: Stream[Array[Byte]]) =>
     import scalaz.contrib.hash.crc32.CRC32Monoid
     import scalaz.std.stream._
     import scalaz.syntax.foldable._
@@ -44,7 +44,7 @@ class CRC32Spec extends Specification with ScalaCheck { def is = s2"""
     compare(scrc, JCRC32(bufs))
   }
 
-  def e5 = prop { (bufs: Stream[Array[Byte]]) ⇒
+  def e5 = prop { (bufs: Stream[Array[Byte]]) =>
     val monoid = spire.contrib.hash.crc32.CRC32Monoid
 
     val scrc = bufs.map(CRC32.apply).foldLeft(monoid.id)(monoid.op)

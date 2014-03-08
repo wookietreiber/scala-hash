@@ -1,6 +1,6 @@
 package scalax.hash
 
-import java.util.zip.{ Adler32 ⇒ JAdler32 }
+import java.util.zip.{ Adler32 => JAdler32 }
 
 import org.specs2._
 
@@ -22,19 +22,19 @@ class Adler32Spec extends Specification with ScalaCheck { def is = s2"""
 
   def e0 = compare(Adler32.empty, new JAdler32)
 
-  def e1 = prop { (a: Array[Byte]) ⇒
+  def e1 = prop { (a: Array[Byte]) =>
     compare(Adler32(a), JAdler32(a))
   }
 
-  def e2 = prop { (a: Array[Byte]) ⇒
+  def e2 = prop { (a: Array[Byte]) =>
     compare(Adler32(a), JAdler32(a))
   }.set(minTestsOk = 20, minSize = 10000, maxSize = 100000)
 
-  def e3 = prop { (a: Array[Byte], b: Array[Byte]) ⇒
+  def e3 = prop { (a: Array[Byte], b: Array[Byte]) =>
     compare(Adler32(a) update Adler32(b), JAdler32(a ++ b))
   }
 
-  def e4 = prop { (bufs: Stream[Array[Byte]]) ⇒
+  def e4 = prop { (bufs: Stream[Array[Byte]]) =>
     import scalaz.contrib.hash.adler32.Adler32Monoid
     import scalaz.std.stream._
     import scalaz.syntax.foldable._
@@ -44,7 +44,7 @@ class Adler32Spec extends Specification with ScalaCheck { def is = s2"""
     compare(sa, JAdler32(bufs))
   }
 
-  def e5 = prop { (bufs: Stream[Array[Byte]]) ⇒
+  def e5 = prop { (bufs: Stream[Array[Byte]]) =>
     val monoid = spire.contrib.hash.adler32.Adler32Monoid
 
     val sa = bufs.map(Adler32.apply).foldLeft(monoid.id)(monoid.op)

@@ -47,7 +47,7 @@ final case class CRC32 private (hash: Long) (private val fed: Long) {
     var crc2 = that.hash
     var length = that.fed
 
-    var odd  = Array.tabulate(CRC32.GF2_DIM) { n ⇒
+    var odd  = Array.tabulate(CRC32.GF2_DIM) { n =>
       if (n == 0)
         3988292384L
       else {
@@ -103,7 +103,7 @@ object CRC32 {
   @inline def apply(data: Array[Byte]): CRC32 =
     empty.update(data)
 
-  private val table: Array[Int] = Array.tabulate(256) { n ⇒
+  private val table: Array[Int] = Array.tabulate(256) { n =>
     var c = n
     var k = 7
 
@@ -138,6 +138,6 @@ object CRC32 {
   }
 
   @inline private def gf2MatrixSquare(mat: Array[Long]): Array[Long] =
-    Array.tabulate(GF2_DIM)(i ⇒ gf2MatrixTimes(mat, mat(i)))
+    Array.tabulate(GF2_DIM)(i => gf2MatrixTimes(mat, mat(i)))
 
 }

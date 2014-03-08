@@ -50,7 +50,7 @@ lazy val benchmarks = (
   dependsOn(hash, scalazContrib, spireContrib)
   settings(
     libraryDependencies ++= Seq(scalameter),
-    fork in run := true,
+    logBuffered := false,
     testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
   )
 )

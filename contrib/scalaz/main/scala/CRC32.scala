@@ -15,7 +15,7 @@ trait CRC32Instances {
 
   implicit val CRC32Monoid: Monoid[CRC32] = new Monoid[CRC32] {
     override val zero = CRC32.empty
-    override def append(x: CRC32, y: ⇒ CRC32): CRC32 =
+    override def append(x: CRC32, y: => CRC32): CRC32 =
       x update y
   }
 
