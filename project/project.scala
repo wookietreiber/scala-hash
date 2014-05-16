@@ -7,6 +7,8 @@ import Keys._
 object HashProject {
   def apply(name: String, path: String): Project = (
     Project(name, file(path))
-    settings(commonSettings: _*)
+    settings (
+      sourceDirectory <<= baseDirectory(identity)
+    )
   )
 }
