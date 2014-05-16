@@ -85,10 +85,9 @@ final case class Adler32 private (hash: Long) (private val fed: Long) {
     s1 += (h2 & 65535) + 65521L - 1L
     s2 += ((h1 >> 16) & 65535) + ((h2 >> 16) & 65535) + 65521L - remainder
 
-    if (s1 >= 65521L)
-      s1 -= 65521L
-
-    if (s1 >= 65521L)
+    if (s1 >= 131042L)
+      s1 -= 131042L
+    else if (s1 >= 65521L)
       s1 -= 65521L
 
     if (s2 >= (65521L << 1))
