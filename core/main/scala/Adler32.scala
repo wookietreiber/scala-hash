@@ -1,33 +1,20 @@
 package scalax.hash
 
-/** An Adler32 checksum.
-  *
-  * @param hash Returns the checksum value.
-  */
-final case class Adler32 private (hash: Long) (private val fed: Long) {
+import scodec.bits.ByteVector
 
-  @inline private def split: (Long,Long) = {
-    val s1 = hash & 65535
-    val s2 = (hash >> 16) & 65535
-    (s1,s2)
-  }
+/** An Adler32 checksum. */
+final case class Adler32 private[hash] (private[hash] val a: Long, private[hash] val b: Long) {
 
-  /** Updates this Adler32 with new data.
-    *
-    * @param data the data to update this Adler32 with
-    */
-  @inline def update(data: Array[Byte]): Adler32 =
-    update(data, 0, data.length)
+  /** Returns the checksum value. */
+  def value: Long =
+    (a | (b << 16)).toLong
 
-  /** Updates this Adler32 with new data.
-    *
-    * @param data the data to update this Adler32 with
-    * @param start the start index to use from the data buffer
-    * @param length the amount of bytes to use from the data buffer
-    */
-  def update(data: Array[Byte], start: Int, length: Int): Adler32 = {
-    var (s1,s2) = split
-    var index = start
+  /** Updates this Adler32 with new data. */
+  @inline def update(data: ByteVector): Adler32 = {
+    val length = data.length
+    var s1 = a
+    var s2 = b
+    var index = 0
 
     if (length == 1) {
       s1 += data(index) & 255
@@ -65,38 +52,7 @@ final case class Adler32 private (hash: Long) (private val fed: Long) {
       s2 %= 65521L
     }
 
-    Adler32.join(s1, s2, fed + length)
-  }
-
-  /** Updates this Adler32 with another one.
-    *
-    * @param that the Adler32 to update with
-    */
-  def update(that: Adler32): Adler32 = {
-    val length = that.fed
-    val h1 = hash
-    val h2 = that.hash
-
-    val remainder = length % 65521L
-    var s1 = h1 & 65535
-    var s2 = remainder * s1
-
-    s2 %= 65521L
-    s1 += (h2 & 65535) + 65521L - 1L
-    s2 += ((h1 >> 16) & 65535) + ((h2 >> 16) & 65535) + 65521L - remainder
-
-    if (s1 >= 131042L)
-      s1 -= 131042L
-    else if (s1 >= 65521L)
-      s1 -= 65521L
-
-    if (s2 >= (65521L << 1))
-      s2 -= (65521L << 1)
-
-    if (s2 >= 65521L)
-      s2 -= 65521L
-
-    Adler32.join(s1, s2, this.fed + that.fed)
+    new Adler32(s1, s2)
   }
 
 }
@@ -105,19 +61,49 @@ final case class Adler32 private (hash: Long) (private val fed: Long) {
 object Adler32 {
 
   /** Returns the empty Adler32. */
-  val empty: Adler32 = new Adler32(1L)(0L)
+  val empty: Adler32 = new Adler32(1L, 0L)
 
-  /** Returns the empty Adler32. */
-  @inline def apply(): Adler32 = empty
-
-  /** Returns the Adler32 of the given data buffer.
-    *
-    * @param data the data buffer from which to build the Adler32
-    */
-  @inline def apply(data: Array[Byte]): Adler32 =
+  /** Returns the Adler32 of the given data buffer. */
+  @inline def apply(data: ByteVector): Adler32 =
     empty.update(data)
 
-  @inline private def join(s1: Long, s2: Long, fed: Long): Adler32 =
-    new Adler32(s1 | (s2 << 16))(fed)
+}
 
+final case class Adler32M private (private val adler32: Adler32, private val fed: Int) {
+  /** Returns the checksum value. */
+  def value: Long = adler32.value
+
+  /** Updates this Adler32 with another one. */
+  def update(that: Adler32M): Adler32M = {
+    val length = that.fed
+    val remainder = length % 65521
+    var s1 = adler32.a
+    var s2 = remainder * s1
+
+    s2 %= 65521
+    s1 += that.adler32.a + 65520
+    s2 += (adler32.b & 65535) + (that.adler32.b & 65535) + 65521 - remainder
+
+    if (s1 >= 131042)
+      s1 -= 131042
+    else if (s1 >= 65521)
+      s1 -= 65521
+
+    if (s2 >= (65521 << 1))
+      s2 -= 65521 << 1
+
+    if (s2 >= 65521)
+      s2 -= 65521
+
+    new Adler32M(new Adler32(s1, s2), this.fed + that.fed)
+  }
+}
+
+object Adler32M {
+  /** Returns the empty Adler32. */
+  val empty: Adler32M = new Adler32M(Adler32.empty, 0)
+
+  /** Returns the Adler32 of the given data buffer. */
+  @inline def apply(data: ByteVector): Adler32M =
+    new Adler32M(Adler32(data), data.length)
 }

@@ -6,7 +6,7 @@ import UnidocKeys._
 lazy val root = (
   HashProject("scala-hash", ".")
   settings(sbtunidoc.Plugin.unidocSettings: _*)
-  settings(
+  settings (
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmarks),
     scalacOptions in (Compile, doc) ++=
       Seq("-sourcepath", baseDirectory.value.getAbsolutePath, "-doc-source-url",
@@ -17,30 +17,31 @@ lazy val root = (
 
 lazy val hash = (
   HashProject("scala-hash-core", "core")
+  settings (
+    libraryDependencies += scodec
+  )
 )
 
 lazy val scalacheckBinding = (
   HashProject("scala-hash-scalacheck-binding", "scalacheck")
   dependsOn(hash)
-  settings(
+  settings (
     libraryDependencies += scalacheck % Provided
   )
 )
 
 lazy val scalazContrib = (
   HashProject("scala-hash-scalaz-contrib", "contrib/scalaz")
-  dependsOn(hash)
-  dependsOn(scalacheckBinding % "test")
-  settings(
+  dependsOn(hash, scalacheckBinding % "test")
+  settings (
     libraryDependencies ++= Seq(scalaz, scalazscb % "test")
   )
 )
 
 lazy val spireContrib = (
   HashProject("scala-hash-spire-contrib", "contrib/spire")
-  dependsOn(hash)
-  dependsOn(scalacheckBinding % "test")
-  settings(
+  dependsOn(hash, scalacheckBinding % "test")
+  settings (
     libraryDependencies ++= Seq(spire, spirescb % "test")
   )
 )
@@ -48,8 +49,8 @@ lazy val spireContrib = (
 lazy val benchmarks = (
   HashProject("scala-hash-benchmarks", "benchmarks")
   dependsOn(hash, scalazContrib, spireContrib)
-  settings(
-    libraryDependencies ++= Seq(scalameter),
+  settings (
+    libraryDependencies += scalameter,
     logBuffered := false,
     testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
   )
@@ -58,7 +59,7 @@ lazy val benchmarks = (
 lazy val tests = (
   HashProject("scala-hash-tests", "tests")
   dependsOn(hash, scalazContrib, spireContrib)
-  settings(
+  settings (
     libraryDependencies ++= Seq(specs2 % "test")
   )
 )

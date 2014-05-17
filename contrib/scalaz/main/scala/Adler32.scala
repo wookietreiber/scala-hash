@@ -7,8 +7,8 @@ object adler32 extends Adler32Instances
 
 trait Adler32Instances {
 
-  type Adler32 = scalax.hash.Adler32
-  val  Adler32 = scalax.hash.Adler32
+  type Adler32 = scalax.hash.Adler32M
+  val  Adler32 = scalax.hash.Adler32M
 
   implicit val Adler32Equal: Equal[Adler32] =
     Equal.equalA
