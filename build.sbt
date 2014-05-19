@@ -12,43 +12,40 @@ lazy val root = (
       Seq("-sourcepath", baseDirectory.value.getAbsolutePath, "-doc-source-url",
         "https://github.com/wookietreiber/scala-hash/tree/master€{FILE_PATH}.scala")
   )
-  aggregate(hash, scalacheckBinding, scalazContrib, spireContrib, tests, benchmarks)
+  aggregate(core, streams, scalazContrib, tests, benchmarks)
 )
 
-lazy val hash = (
+lazy val core = (
   HashProject("scala-hash-core", "core")
+  configs(IntegrationTest)
+  settings(Defaults.itSettings: _*)
   settings (
-    libraryDependencies += scodec
+    libraryDependencies ++= Seq(scodecBits, scalaz),
+    libraryDependencies ++= Seq(scalameter, scalacheck, scalazscb).map(_ % "it"),
+    logBuffered in IntegrationTest := false,
+    testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
   )
 )
 
-lazy val scalacheckBinding = (
-  HashProject("scala-hash-scalacheck-binding", "scalacheck")
-  dependsOn(hash)
+lazy val streams = (
+  HashProject("scala-hash-stream", "stream")
+  dependsOn(core, scalazContrib)
   settings (
-    libraryDependencies += scalacheck % Provided
+    libraryDependencies += stream
   )
 )
 
 lazy val scalazContrib = (
   HashProject("scala-hash-scalaz-contrib", "contrib/scalaz")
-  dependsOn(hash, scalacheckBinding % "test")
+  dependsOn(core)
   settings (
     libraryDependencies ++= Seq(scalaz, scalazscb % "test")
   )
 )
 
-lazy val spireContrib = (
-  HashProject("scala-hash-spire-contrib", "contrib/spire")
-  dependsOn(hash, scalacheckBinding % "test")
-  settings (
-    libraryDependencies ++= Seq(spire, spirescb % "test")
-  )
-)
-
 lazy val benchmarks = (
   HashProject("scala-hash-benchmarks", "benchmarks")
-  dependsOn(hash, scalazContrib, spireContrib)
+  dependsOn(core, scalazContrib)
   settings (
     libraryDependencies += scalameter,
     logBuffered := false,
@@ -58,8 +55,8 @@ lazy val benchmarks = (
 
 lazy val tests = (
   HashProject("scala-hash-tests", "tests")
-  dependsOn(hash, scalazContrib, spireContrib)
+  dependsOn(core, scalazContrib)
   settings (
-    libraryDependencies ++= Seq(specs2 % "test")
+    libraryDependencies ++= Seq(scodecCore % "test", specs2 % "test")
   )
 )

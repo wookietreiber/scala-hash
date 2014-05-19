@@ -15,10 +15,13 @@ object Dependencies {
 
   val specs2 = "org.specs2" %% "specs2-scalacheck" % "2.3.12"
 
-  val scodec = "org.typelevel" %% "scodec-bits" % "1.0.0"
+  val scodecBits = "org.typelevel" %% "scodec-bits" % "1.0.0"
+  val scodecCore = "org.typelevel" %% "scodec-core" % "1.0.0"
 
   val scalaz    = "org.scalaz" %% "scalaz-core"               % Versions.scalaz
   val scalazscb = "org.scalaz" %% "scalaz-scalacheck-binding" % Versions.scalaz
+
+  val stream = "org.scalaz.stream" %% "scalaz-stream" % "0.4.1"
 
   val spire    = "org.spire-math" %% "spire"                    % Versions.spire
   val spirescb = "org.spire-math" %% "spire-scalacheck-binding" % Versions.spire

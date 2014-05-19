@@ -1,25 +1,27 @@
 package scalaz.contrib
 package hash
 
+import scalax.hash._
 import scalaz._
 
-object adler32 extends Adler32Instances
+trait ScalazHashModule extends HashCombinationModule {
 
-trait Adler32Instances {
+  implicit def HashEqual: Equal[Hash] =
+    Equal.equal(_.value == _.value)
 
-  type Adler32 = scalax.hash.Adler32M
-  val  Adler32 = scalax.hash.Adler32M
+  implicit def HashCombinationEqual: Equal[HashCombination] =
+    Equal.equal(_.value == _.value)
 
-  implicit val Adler32Equal: Equal[Adler32] =
-    Equal.equalA
-
-  implicit val Adler32Monoid: Monoid[Adler32] = new Monoid[Adler32] {
-    override val zero = Adler32.empty
-    override def append(x: Adler32, y: => Adler32): Adler32 =
+  implicit def HashCombinationMonoid: Monoid[HashCombination] = new Monoid[HashCombination] {
+    override val zero = HashCombination.empty
+    override def append(x: HashCombination, y: => HashCombination): HashCombination =
       x update y
   }
 
-  implicit val Adler32Show: Show[Adler32] =
+  implicit def HashShow: Show[Hash] =
+    Show.showFromToString
+
+  implicit def HashCombinationShow: Show[HashCombination] =
     Show.showFromToString
 
 }

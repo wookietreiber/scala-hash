@@ -3,6 +3,7 @@ package scalax.hash
 import java.util.zip.{ CRC32 => JCRC32 }
 
 import org.specs2._
+import scodec.bits.ByteVector
 
 class CRC32Spec extends Specification with ScalaCheck { def is = s2"""
 
@@ -13,41 +14,31 @@ class CRC32Spec extends Specification with ScalaCheck { def is = s2"""
   (checksum) must be equal to the default implementation (large, i.e. delay)              $e2
   (checksum) combination should be equal to the single run                                $e3
   (scalaz combination monoid) must be equal to the default implementation                 $e4
-  (spire combination monoid) must be equal to the default implementation                  $e5
                                                                                                  """
 
   // -----------------------------------------------------------------------------------------------
   // tests
   // -----------------------------------------------------------------------------------------------
 
-  def e0 = compare(CRC32.empty, new JCRC32)
+  def e0 = compare(CRC32.Hash.empty, new JCRC32)
 
   def e1 = prop { (a: Array[Byte]) =>
-    compare(CRC32(a), JCRC32(a))
+    compare(CRC32.Hash(ByteVector.view(a)), JCRC32(a))
   }
 
   def e2 = prop { (a: Array[Byte]) =>
-    compare(CRC32(a), JCRC32(a))
+    compare(CRC32.Hash(ByteVector.view(a)), JCRC32(a))
   }.set(minTestsOk = 20, minSize = 10000, maxSize = 100000)
 
   def e3 = prop { (a: Array[Byte], b: Array[Byte]) =>
-    compare(CRC32(a) update CRC32(b), JCRC32(a ++ b))
+    compare(CRC32.HashCombination(ByteVector.view(a)) update CRC32.HashCombination(ByteVector.view(b)), JCRC32(a ++ b))
   }
 
   def e4 = prop { (bufs: Stream[Array[Byte]]) =>
-    import scalaz.contrib.hash.crc32.CRC32Monoid
     import scalaz.std.stream._
     import scalaz.syntax.foldable._
 
-    val scrc = bufs.foldMap(CRC32.apply)
-
-    compare(scrc, JCRC32(bufs))
-  }
-
-  def e5 = prop { (bufs: Stream[Array[Byte]]) =>
-    val monoid = spire.contrib.hash.crc32.CRC32Monoid
-
-    val scrc = bufs.map(CRC32.apply).foldLeft(monoid.id)(monoid.op)
+    val scrc = bufs.foldMap(buf => CRC32.HashCombination(ByteVector.view(buf)))
 
     compare(scrc, JCRC32(bufs))
   }
@@ -56,7 +47,12 @@ class CRC32Spec extends Specification with ScalaCheck { def is = s2"""
   // util
   // -----------------------------------------------------------------------------------------------
 
-  def compare(scrc: CRC32, jcrc: JCRC32) = scrc.hash === jcrc.getValue
+  def compare(sa: CRC32.Hash, ja: JCRC32) = compare0(sa.value, ja.getValue)
+  def compare(sa: CRC32.HashCombination, ja: JCRC32) = compare0(sa.value, ja.getValue)
+
+  def compare0(bv: ByteVector, l: Long) = {
+    scodec.codecs.ulong(32).decode(bv.bits).map(_._2 == l).toOption must beSome(true)
+  }
 
   def JCRC32(buf: Array[Byte]) = {
     val jcrc = new JCRC32

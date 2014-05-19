@@ -13,41 +13,31 @@ class Adler32Spec extends Specification with ScalaCheck { def is = s2"""
   (checksum) must be equal to the default implementation (large, i.e. delay)              $e2
   (checksum) combination should be equal to the single run                                $e3
   (scalaz combination monoid) must be equal to the default implementation                 $e4
-  (spire combination monoid) must be equal to the default implementation                  $e5
                                                                                                  """
 
   // -----------------------------------------------------------------------------------------------
   // tests
   // -----------------------------------------------------------------------------------------------
 
-  def e0 = compare(Adler32.empty, new JAdler32)
+  def e0 = compare(Adler32.Hash.empty, new JAdler32)
 
   def e1 = prop { (a: Array[Byte]) =>
-    compare(Adler32(ByteVector(a)), JAdler32(a))
+    compare(Adler32.Hash(ByteVector.view(a)), JAdler32(a))
   }
 
   def e2 = prop { (a: Array[Byte]) =>
-    compare(Adler32(ByteVector(a)), JAdler32(a))
+    compare(Adler32.Hash(ByteVector.view(a)), JAdler32(a))
   }.set(minTestsOk = 20, minSize = 10000, maxSize = 100000)
 
   def e3 = prop { (a: Array[Byte], b: Array[Byte]) =>
-    compare(Adler32M(ByteVector(a)) update Adler32M(ByteVector(b)), JAdler32(a ++ b))
+    compare(Adler32.HashCombination(ByteVector.view(a)) update Adler32.HashCombination(ByteVector.view(b)), JAdler32(a ++ b))
   }
 
   def e4 = prop { (bufs: Stream[Array[Byte]]) =>
-    import scalaz.contrib.hash.adler32.Adler32Monoid
     import scalaz.std.stream._
     import scalaz.syntax.foldable._
 
-    val sa = bufs.foldMap(buf => Adler32M(ByteVector(buf)))
-
-    compare(sa, JAdler32(bufs))
-  }
-
-  def e5 = prop { (bufs: Stream[Array[Byte]]) =>
-    val monoid = spire.contrib.hash.adler32.Adler32Monoid
-
-    val sa = bufs.map(buf => Adler32M(ByteVector(buf))).foldLeft(monoid.id)(monoid.op)
+    val sa = bufs.foldMap(buf => Adler32.HashCombination(ByteVector.view(buf)))
 
     compare(sa, JAdler32(bufs))
   }
@@ -56,8 +46,12 @@ class Adler32Spec extends Specification with ScalaCheck { def is = s2"""
   // util
   // -----------------------------------------------------------------------------------------------
 
-  def compare(sa: Adler32, ja: JAdler32) = sa.value === ja.getValue
-  def compare(sa: Adler32M, ja: JAdler32) = sa.value === ja.getValue
+  def compare(sa: Adler32.Hash, ja: JAdler32) = compare0(sa.value, ja.getValue)
+  def compare(sa: Adler32.HashCombination, ja: JAdler32) = compare0(sa.value, ja.getValue)
+
+  def compare0(bv: ByteVector, l: Long) = {
+    scodec.codecs.ulong(32).decode(bv.bits).map(_._2 == l).toOption must beSome(true)
+  }
 
   def JAdler32(buf: Array[Byte]) = {
     val ja = new JAdler32
