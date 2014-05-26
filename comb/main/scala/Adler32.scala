@@ -13,19 +13,19 @@ object Adler32Combination extends Adler32Combination
 trait Adler32Combination extends HashCombinationModule with Adler32 {
 
   /** A $hash combination. */
-  case class HashCombination private[hash] (private val adler32: Hash, private val fed: Int) extends HashCombinationLike {
+  case class HashCombination private[hash] (private val underlying: Hash, private val fed: Int) extends HashCombinationLike {
     def value: ByteVector =
-      adler32.value
+      underlying.value
 
     def update(that: HashCombination): HashCombination = {
       val length = that.fed
       val remainder = length % 65521
-      var s1 = adler32.a
+      var s1 = underlying.a
       var s2 = remainder * s1
 
       s2 %= 65521
-      s1 += that.adler32.a + 65520
-      s2 += (adler32.b & 65535) + (that.adler32.b & 65535) + 65521 - remainder
+      s1 += that.underlying.a + 65520
+      s2 += (underlying.b & 65535) + (that.underlying.b & 65535) + 65521 - remainder
 
       if (s1 >= 131042)
         s1 -= 131042
