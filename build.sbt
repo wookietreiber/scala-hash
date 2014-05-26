@@ -45,8 +45,11 @@ lazy val streams = (
 lazy val scalazContrib = (
   HashProject("scala-hash-scalaz-contrib", "contrib/scalaz")
   dependsOn(comb)
+  configs(IntegrationTest)
+  settings(Defaults.itSettings: _*)
   settings (
-    libraryDependencies ++= Seq(scalaz, scalazscb % "test")
+    libraryDependencies += scalaz,
+    libraryDependencies += scalazscb % "it"
   )
 )
 

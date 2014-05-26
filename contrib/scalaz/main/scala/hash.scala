@@ -1,13 +1,21 @@
 package scalaz.contrib
 package hash
 
+import scalax.hash.HashModule
 import scalax.hash.comb.HashCombinationModule
 import scalaz._
 
-trait ScalazHashCombinationModule extends HashCombinationModule {
+trait ScalazHashModule extends HashModule {
 
   implicit def HashEqual: Equal[Hash] =
     Equal.equal(_.value == _.value)
+
+  implicit def HashShow: Show[Hash] =
+    Show.showFromToString
+
+}
+
+trait ScalazHashCombinationModule extends HashCombinationModule {
 
   implicit def HashCombinationEqual: Equal[HashCombination] =
     Equal.equal(_.value == _.value)
@@ -17,9 +25,6 @@ trait ScalazHashCombinationModule extends HashCombinationModule {
     override def append(x: HashCombination, y: => HashCombination): HashCombination =
       x update y
   }
-
-  implicit def HashShow: Show[Hash] =
-    Show.showFromToString
 
   implicit def HashCombinationShow: Show[HashCombination] =
     Show.showFromToString
