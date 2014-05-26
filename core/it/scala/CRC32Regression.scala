@@ -3,13 +3,13 @@ package scalax.hash
 import org.scalameter.api._
 import scodec.bits.ByteVector
 
-object Adler32Regression extends PerformanceTest.OfflineRegressionReport with Adler32 {
+object CRC32Regression extends PerformanceTest.OfflineRegressionReport with CRC32 {
   val sizes = Gen.range("megabyte")(2,16,2)
 
   val streams = for (size <- sizes) yield
     Stream.fill(size)(ByteVector.view(Random.MB))
 
-  performance of "Adler32" in {
+  performance of "CRC32" in {
     measure method "update" in {
       using(streams) config (
         exec.benchRuns -> 10,

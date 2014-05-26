@@ -20,10 +20,19 @@ lazy val core = (
   configs(IntegrationTest)
   settings(Defaults.itSettings: _*)
   settings (
-    libraryDependencies ++= Seq(scodecBits, scalaz),
-    libraryDependencies ++= Seq(scalameter, scalacheck, scalazscb).map(_ % "it"),
+    libraryDependencies += scodecBits,
+    libraryDependencies ++= Seq(specs2, scodecCore).map(_ % "test"),
+    libraryDependencies += scalameter % "it",
     logBuffered in IntegrationTest := false,
     testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
+  )
+)
+
+lazy val comb = (
+  HashProject("scala-hash-combination", "comb")
+  dependsOn(core)
+  settings (
+    libraryDependencies += stream
   )
 )
 

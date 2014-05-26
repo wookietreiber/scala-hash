@@ -1,4 +1,5 @@
 package scalax.hash
+package comb
 
 import scodec.bits.ByteVector
 

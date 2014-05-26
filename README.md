@@ -13,7 +13,8 @@ Iteratee, ...
 Acknowledgments
 ---------------
 
-- [jzlib](http://www.jcraft.com/jzlib/) for Adler32 and CRC32 pure Java implementation
+- [jzlib](http://www.jcraft.com/jzlib/) for pure Adler32 and CRC32 Java implementations, which I
+  ported to Scala
 
 
 ---
