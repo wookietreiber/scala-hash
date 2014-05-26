@@ -35,6 +35,10 @@ trait HashCombinationModule extends HashModule {
     /** Updates this $hash combination with new data. */
     def update(that: HashCombination): HashCombination
 
+    /** Returns a string representation of the $hash value. */
+    override final def toString: String =
+      value.toString
+
   }
 
   /** A hash combination companion.

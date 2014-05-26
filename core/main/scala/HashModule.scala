@@ -23,6 +23,10 @@ trait HashModule {
     /** Updates this $hash with new data. */
     def update(data: ByteVector): Hash
 
+    /** Returns a string representation of the $hash value. */
+    override final def toString: String =
+      value.toString
+
   }
 
   /** A hash companion. */
