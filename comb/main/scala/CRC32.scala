@@ -3,15 +3,16 @@ package comb
 
 import scodec.bits.ByteVector
 
-/** A stand-alone, concrete 32-bit cyclic redundancy check module. */
+/** A stand-alone, concrete $hash module. */
 object CRC32Combination extends CRC32Combination
 
-/** A concrete 32-bit cyclic redundancy check module.
+/** A concrete $hash module.
   *
   * @define hash 32-bit cyclic redundancy check
   */
 trait CRC32Combination extends HashCombinationModule with CRC32 {
 
+  /** A $hash combination. */
   case class HashCombination private[hash] (private val underlying: Hash, private val fed: Int) extends HashCombinationLike {
     def value: ByteVector =
       underlying.value
@@ -66,7 +67,7 @@ trait CRC32Combination extends HashCombinationModule with CRC32 {
     }
   }
 
-  object HashCombination extends HashCombinationFactory {
+  object HashCombination extends HashCombinationCompanion {
     val empty: HashCombination = new HashCombination(Hash.empty, 0)
 
     def apply(data: ByteVector): HashCombination =
@@ -92,9 +93,6 @@ trait CRC32Combination extends HashCombinationModule with CRC32 {
 
     private def gf2MatrixSquare(mat: Array[Long]): Array[Long] =
       Array.tabulate(GF2_DIM)(i => gf2MatrixTimes(mat, mat(i)))
-
-    val seqop  = (a: HashCombination, chunk: ByteVector) => a update HashCombination(chunk)
-    val combop = (a: HashCombination, b: HashCombination) => a update b
   }
 
 }

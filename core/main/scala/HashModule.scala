@@ -11,8 +11,8 @@ trait HashModule {
   /** The hash implementation. */
   type Hash <: HashLike
 
-  /** The $hash factory. */
-  def Hash: HashFactory
+  /** The $hash companion. */
+  def Hash: HashCompanion
 
   /** The hash interface. */
   protected trait HashLike {
@@ -25,8 +25,8 @@ trait HashModule {
 
   }
 
-  /** A hash factory. */
-  protected trait HashFactory {
+  /** A hash companion. */
+  protected trait HashCompanion {
 
     /** Returns the $hash that has been fed no data. */
     def empty: Hash

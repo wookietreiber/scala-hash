@@ -1,10 +1,10 @@
 package scalaz.contrib
 package hash
 
-import scalax.hash._
+import scalax.hash.comb.HashCombinationModule
 import scalaz._
 
-trait ScalazHashModule extends HashCombinationModule {
+trait ScalazHashCombinationModule extends HashCombinationModule {
 
   implicit def HashEqual: Equal[Hash] =
     Equal.equal(_.value == _.value)

@@ -7,12 +7,13 @@ lazy val root = (
   HashProject("scala-hash", ".")
   settings(sbtunidoc.Plugin.unidocSettings: _*)
   settings (
+    autoAPIMappings in (ScalaUnidoc, unidoc) := true,
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmarks),
     scalacOptions in (Compile, doc) ++=
       Seq("-sourcepath", baseDirectory.value.getAbsolutePath, "-doc-source-url",
         "https://github.com/wookietreiber/scala-hash/tree/master€{FILE_PATH}.scala")
   )
-  aggregate(core, streams, scalazContrib, tests, benchmarks)
+  aggregate(core, comb, streams, scalazContrib, tests, benchmarks)
 )
 
 lazy val core = (
@@ -31,9 +32,6 @@ lazy val core = (
 lazy val comb = (
   HashProject("scala-hash-combination", "comb")
   dependsOn(core)
-  settings (
-    libraryDependencies += stream
-  )
 )
 
 lazy val streams = (
@@ -46,7 +44,7 @@ lazy val streams = (
 
 lazy val scalazContrib = (
   HashProject("scala-hash-scalaz-contrib", "contrib/scalaz")
-  dependsOn(core)
+  dependsOn(comb)
   settings (
     libraryDependencies ++= Seq(scalaz, scalazscb % "test")
   )
@@ -54,7 +52,7 @@ lazy val scalazContrib = (
 
 lazy val benchmarks = (
   HashProject("scala-hash-benchmarks", "benchmarks")
-  dependsOn(core, scalazContrib)
+  dependsOn(core, comb, scalazContrib)
   settings (
     libraryDependencies += scalameter,
     logBuffered := false,

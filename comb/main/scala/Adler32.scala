@@ -3,15 +3,16 @@ package comb
 
 import scodec.bits.ByteVector
 
-/** A stand-alone, concrete 32-bit adler hash module. */
+/** A stand-alone, concrete $hash combination module. */
 object Adler32Combination extends Adler32Combination
 
-/** A concrete 32-bit adler hash module.
+/** A concrete $hash combination module.
   *
   * @define hash 32-bit adler
   */
-trait Adler32Combination extends HashCombinationModule {
+trait Adler32Combination extends HashCombinationModule with Adler32 {
 
+  /** A $hash combination. */
   case class HashCombination private[hash] (private val adler32: Hash, private val fed: Int) extends HashCombinationLike {
     def value: ByteVector =
       adler32.value
@@ -41,14 +42,11 @@ trait Adler32Combination extends HashCombinationModule {
     }
   }
 
-  object HashCombination extends HashCombinationFactory {
+  object HashCombination extends HashCombinationCompanion {
     val empty: HashCombination = new HashCombination(Hash.empty, 0)
 
     def apply(data: ByteVector): HashCombination =
       new HashCombination(Hash(data), data.length)
-
-    val seqop  = (a: HashCombination, chunk: ByteVector) => a update HashCombination(chunk)
-    val combop = (a: HashCombination, b: HashCombination) => a update b
   }
 
 }

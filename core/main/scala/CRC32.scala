@@ -2,7 +2,7 @@ package scalax.hash
 
 import scodec.bits.ByteVector
 
-/** A stand-alone, concrete 32-bit cyclic redundancy check module. */
+/** A stand-alone, concrete $hash module. */
 object CRC32 extends CRC32 {
   private val table: Array[Int] = Array.tabulate(256) { n =>
     var c = n
@@ -21,13 +21,13 @@ object CRC32 extends CRC32 {
   }
 }
 
-/** A concrete 32-bit cyclic redundancy check module.
+/** A concrete $hash module.
   *
   * @define hash 32-bit cyclic redundancy check
   */
 trait CRC32 extends HashModule {
 
-  /** A 32-bit cyclic redundancy check. */
+  /** A $hash. */
   case class Hash private[hash] (private[hash] val hash: Int) extends HashLike {
 
     def value: ByteVector = {
@@ -52,7 +52,7 @@ trait CRC32 extends HashModule {
     }
   }
 
-  object Hash extends HashFactory {
+  object Hash extends HashCompanion {
     val empty: Hash = new Hash(-1)
 
     val seqop  = (a: Hash, chunk: ByteVector) => a update chunk

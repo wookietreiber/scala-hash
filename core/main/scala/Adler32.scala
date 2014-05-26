@@ -2,16 +2,16 @@ package scalax.hash
 
 import scodec.bits.ByteVector
 
-/** A stand-alone, concrete 32-bit adler hash module. */
+/** A stand-alone, concrete $hash module. */
 object Adler32 extends Adler32
 
-/** A concrete 32-bit adler hash module.
+/** A concrete $hash module.
   *
   * @define hash 32-bit adler
   */
 trait Adler32 extends HashModule {
 
-  /** A 32-bit adler hash. */
+  /** A $hash. */
   case class Hash private[hash] (private[hash] val a: Long, private[hash] val b: Long) extends HashLike {
     def value: ByteVector = ByteVector (
       (b >>> 8).toByte, b.toByte, (a >>> 8).toByte, a.toByte
@@ -63,7 +63,7 @@ trait Adler32 extends HashModule {
     }
   }
 
-  object Hash extends HashFactory {
+  object Hash extends HashCompanion {
     val empty: Hash = new Hash(1L, 0L)
 
     val seqop  = (a: Hash, chunk: ByteVector) => a update chunk

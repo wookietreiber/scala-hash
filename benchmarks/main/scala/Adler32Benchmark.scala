@@ -7,7 +7,7 @@ import scalaz.std.stream._
 import scalaz.syntax.foldable._
 import scodec.bits.ByteVector
 
-object Adler32Benchmark extends PerformanceTest with Adler32 with ScalazHashModule {
+object Adler32Benchmark extends PerformanceTest with comb.Adler32Combination with ScalazHashCombinationModule {
   lazy val executor = LocalExecutor(new Executor.Warmer.Default, Aggregator.min, new Measurer.Default)
   lazy val reporter = Reporter.Composite(new LoggingReporter, ChartReporter(ChartFactory.XYLine()))
   lazy val persistor = Persistor.None
