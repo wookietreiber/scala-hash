@@ -13,7 +13,7 @@ object Dependencies {
 
   val scalacheck = "org.scalacheck" %% "scalacheck" % "1.11.4"
 
-  val specs2 = "org.specs2" %% "specs2-scalacheck" % "2.3.12"
+  val specs2 = "org.specs2" %% "specs2-core" % "2.3.12"
 
   val scodecBits = "org.typelevel" %% "scodec-bits" % "1.0.1"
   val scodecCore = "org.typelevel" %% "scodec-core" % "1.0.0"

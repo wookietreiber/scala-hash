@@ -13,7 +13,7 @@ lazy val root = (
       Seq("-sourcepath", baseDirectory.value.getAbsolutePath, "-doc-source-url",
         "https://github.com/wookietreiber/scala-hash/tree/master€{FILE_PATH}.scala")
   )
-  aggregate(core, comb, streams, scalazContrib, tests, benchmarks)
+  aggregate(core, comb, streams, scalazContrib, benchmarks)
 )
 
 lazy val core = (
@@ -32,6 +32,9 @@ lazy val core = (
 lazy val comb = (
   HashProject("scala-hash-combination", "comb")
   dependsOn(core)
+  settings (
+    libraryDependencies ++= Seq(specs2, scodecCore).map(_ % "test")
+  )
 )
 
 lazy val streams = (
@@ -60,13 +63,5 @@ lazy val benchmarks = (
     libraryDependencies += scalameter,
     logBuffered := false,
     testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
-  )
-)
-
-lazy val tests = (
-  HashProject("scala-hash-tests", "tests")
-  dependsOn(core, scalazContrib)
-  settings (
-    libraryDependencies ++= Seq(scodecCore % "test", specs2 % "test")
   )
 )
